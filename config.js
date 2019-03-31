@@ -1,16 +1,16 @@
 let config = {
-  title: `My Box`,
+  title: `My training box`,
   author: 'kklyoon',
-  description: "이것저것 모음",
+  description: "For study",
   siteUrl: 'https://kklyoon.github.io',
 
   // header config
   titleLogo: () => {
-    return require('./src/images/profile.png');
+    return require('./src/images/profile.jpg');
   },
   titleLogoShow: true,
-  //bio: './conifg.js 에서 설정을 수정해주세요',
-  //bioShow: true,
+  bio: 'Archive',
+  bioShow: true,
 
   // addtional
   googleAnalyticsTrackingId: '',
