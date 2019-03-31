@@ -1,5 +1,5 @@
 let config = {
-  title: `Box`,
+  title: `My Box`,
   author: 'kklyoon',
   description: "이것저것 모음",
   siteUrl: 'https://kklyoon.github.io',
