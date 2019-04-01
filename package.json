@@ -1,8 +1,8 @@
 {
-  "name": "junhobaik-personal-web",
-  "description": "Junho Baik's devLog",
+  "name": "kklyoon-personal-web",
+  "description": "My training box",
   "version": "1.0.0",
-  "author": "Junho Baik <junhobaik@gmail.com>",
+  "author": "Kyounglyoon Kim <kklyoon@gmail.com>",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.6",
     "@fortawesome/free-regular-svg-icons": "^5.4.1",
@@ -55,6 +55,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/junhobaik/junhobaik.github.io"
+    "url": "https://github.com/kklyoon/kklyoon.github.io/"
   }
 }
