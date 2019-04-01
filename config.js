@@ -13,14 +13,14 @@ let config = {
   bioShow: true,
 
   // addtional
-  googleAnalyticsTrackingId: '',
+  googleAnalyticsTrackingId: 'UA-137430673-1',
   disqusShortname: 'kklyoon',
 };
 
 /********************************************** */
 
 if (process.env.NODE_ENV === 'development') {
-  config.googleAnalyticsTrackingId = '';
+  config.googleAnalyticsTrackingId = 'UA-137430673-1';
   config.disqusShortname = '';
 }
 
