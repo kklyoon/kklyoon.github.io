@@ -14,7 +14,7 @@ let config = {
 
   // addtional
   googleAnalyticsTrackingId: '',
-  disqusShortname: '',
+  disqusShortname: 'kklyoon',
 };
 
 /********************************************** */
