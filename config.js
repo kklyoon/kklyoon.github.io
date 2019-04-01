@@ -20,7 +20,7 @@ let config = {
 /********************************************** */
 
 if (process.env.NODE_ENV === 'development') {
-  config.googleAnalyticsTrackingId = 'UA-137430673-1';
+  config.googleAnalyticsTrackingId = '';        // 개발 모드일땐 트래킹 및 disqus 비활성화
   config.disqusShortname = '';
 }
 
