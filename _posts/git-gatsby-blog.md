@@ -39,7 +39,19 @@ Failed to get remote.origin.url (task must either be run in a git repository wit
 
 -----
 
-(추가) Travis-CI 를 사용해볼까?
+(추가) 
+
+https://www.netlify.com/docs/cli/
+
+netlify 주소로는 deploy 가 됨
+
+-----
+
+(추가)
+
+github action 을 이용해서 자동 배포가 가능하다고 함 (아직 beta 라고 함)
+
+[GithubAction](https://github.com/features/actions) 신청한사람을 베타유저로 넣어준다고 하니 일단 신청하고 기다리는 중 
 
 
 ## Reference
