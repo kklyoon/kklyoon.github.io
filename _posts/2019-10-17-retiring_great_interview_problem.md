@@ -4,9 +4,9 @@ date: 2019-10-17
 tags:
   - interview
   - programming
- - 개발자 면접
- - 면접
- - 개발자
+  - 개발자 면접
+  - 면접
+  - 개발자
 ---
 
 이 글은 
