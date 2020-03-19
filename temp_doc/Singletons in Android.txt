@@ -1,0 +1,307 @@
+원문 : https://medium.com/@programmerr47/singletons-in-android-63ddf972a7e7
+
+There are a lot of articles and posts about Singleton Pattern. In fact there are many articles about how bad Singleton Pattern can be and how especially it can be harmful in Android. Here a bunch of them, here, here, here, here and here.
+
+싱글톤 패턴에 대한 글이 여기저기에 많다. 그리고 싱글톤 패턴에 대한 해악을 다른 글도 많다 여기여기여기
+
+But every post concerns only about some small specific problem. Some of them about memory leaking, some of them about loosing a state, some of them about multiprocessing. But I didn’t find an article, that covered all topics. And I will try to touch all of topics, or at least most of them, most of needed to understand, that Singletons are evil, and especial in Android (at least you need to choose them wisely and provide some mechanism to keep their states and e.t.c.).
+
+모든 글이 특정한 작은 문제에 대해 언급한다. 메모리 누수나 멀티 프로세싱에 관한. 하지만 모든 주제를 다루는 글은 찾지 못했다. 그래서 이 글에서 모든 이슈 혹은 대부분의 이슈 대해 다뤄본다.  
+
+Also I do my best to improve my knowledges and skills in programming, in Java, in Android. So I think this article will be useful not only for you, but for me, too.
+
+
+## So, what if I have simple Singleton 
+Let’s look at this code:
+
+public class CarelessSingleton{
+    public static final CarelessSingleton instance = new CarelessSingleton();
+private Object someState;
+    
+    private CarelessSingleton() {} 
+    public void setState(Object state) {
+        this.someState = state;
+    }
+    public Object getState() {
+        return someState;
+    }
+}
+Except ‘lazy initialisation’ and ‘multithreading’ this code has two main problems:
+두가지 문제점
+
+We have published state of singleton that can be changed everywhere. It’s not an Android problem, it’s an architectural problem. Of course we can say: “We know, where to set value”, “There are only couple places and e.t.c”. But still the fact is that such Singleton provides a global variable. And moreover you can not create second or third instance. There is only one instance.
+안드로이드문제가 아닌 아키텍쳐문제, 싱글톤은 글로벌 변수를 다룸. 그리고 두번째 세번째 인스턴스를 만들 수 없음. 하나의 인스턴스만 있음
+
+For android there is more dangerous problem with stateful mutable Singleton. Losing state. If your singleton provides some state that can be changed in your application, then you can easily losing state.
+losing state 문제, 싱글톤에서 다루는 state 가 application 에서 바뀔 수도 있음
+
+Let’s provide some simple application that uses our Singleton. Here layout for activity:
+예로 드는 레이아웃
+
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/test_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="0"/>
+    <Button
+        android:id="@+id/test_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:text="Set global 5" />
+</FrameLayout>
+And activity:
+
+public class MainActivity extends AppCompatActivity {
+    private TextView textView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        textView = (TextView) findViewById(R.id.test_text);
+        displayState();
+        findViewById(R.id.test_button)
+            .setOnClickListener(new View.OnClickListener() 
+                @Override
+                public void onClick(View view) {
+                    CarelessSingleton.instance.setState(5);
+                    displayState();
+                }
+            });
+    }
+    private void displayState() {
+        Object state = CarelessSingleton.instance.getState();
+        textView.setText(String.valueOf(state));
+    }
+}
+Yeap, that’s all. Now we can run our application. And we will see 0 in center of screen. Then we click on the button and see 5 in center. We can rotate an application, for example, or press Home button and then on application icon. And everything will be normal. We will still have 5 on center of the screen. But if we run bunch of other apps: play some games, write couple of emails and e.t.c, and then go back to our application we will se 0 instead of 5. What? What happened?
+
+스크린 중앙에는 0 이 뜰것이고 버튼을 클릭하면 5가 될것이다. 앱을 회전시킬 수도 있다. 혹은 홈버튼을 누르고 앱아이콘을 실행할 수 있다. 모든게 일반적인 동작이다. 여전히 화면가운데에 5가 있다. 하지만 다른 앱을 실행하면 어떨까? 게임을 플레이한다든가 이메일을 쓴다든가 하고 다시 앱으로 돌아오면? 5 대신 0이 떠있나?
+
+## Problem 문제
+During our usage of phone, system was needed more memory and it saw that our application was not used for a while. So it killed it. And then when we went back to our app, system  recreated it, restoring some state. Of course our singleton was not saved and restored, because it’s naive and didn’t know that can be killed.
+기기를 사용하는 동안 시스템은 메모리 사용때문에 일정시간 이상 사용되지 않은 앱을 kill 한다. 그리고 다시 앱으로 돌아오면 시스텝에서 새로 실행을 하게 되고 상태를 다시 불러온다. 물론 싱글톤은 저장되지 않고 다시 불러올 수 없다. 왜냐하면 killed 되었는지 알 수 없으니깐
+
+
+## Solution 솔루션
+There is no so obvious solution as it seems, because such simple singleton can be changed everywhere. In every Activity, in every Fragment, in services — everywhere within its process. Of course, all that we know exactly is that we need to provide some saving mechanism. There are two fast solutions that can come to mind, but both of them are not perfect. In defense, I would say, that using such singleton is not perfect solution of some architect problem.
+확실한 해결책은 없어 보인다. 왜냐면 싱글톤은 모든 곳에서 바뀔 수 있으니. 모든 Activity, Fragment, Service 에서 . 구조적인 문제 때문에 완벽한 해결책은 없어보인다. 간단한 해결책 두개
+
+
+First variant. We can create saveState(Bundle outState)/restoreState(Bundle state) similarly to onSaveInstanceState(Bundle outState)/onRestoreInstanceState(Bundle outState) for our Singleton and then call them wherever we want.
+첫번째 꼼수, onSaveInstanceState 와 비슷하게 savestate ( Bundle state ) / restorestate(Bundle state) 를 사용하기
+
+public void saveState(Bundle state) {
+    state.putInt(SINGLETON_STATE, getState());
+}
+public void restoreState(Bundle state) {
+    setState(state.getInt(SINGLETON_STATE));
+}
+
+But this approach has huge flaw. You need to decide where to save state. In fact, you can choose only between activities, views and fragments. For example, if you changed state of Singleton in activity, then close it, but you have background service that changed state one more time, then app was killed and restarted by the system, you will lose last updating, that was made by service. And of course most likely you will have to call these functions (saveState, restoreState) from all Activities, Views and Fragments which somehow (directly or not) affects to state of Singleton, which produces a lot of boilerplate code.
+하지만 이러한 접근은 큰 단점이 있다. 언제 state 를 저장할지를 정해야한다는 것이다. 사실 activity, view, fragment 들 중 결정할 수 있다. 예를 들어 싱글톤 state 를 activity 에서 변경하고 종료했다고 치면 백그라운드 서비스에서 한번이상 state 를 변경할수도 있다. 그러고 나서 앱이 시스템에 의해 종료되고 재시작하면 싱글톤의 마지막 state 는 불러올 수 없게 된다. 그리고 state 를 저장하고 불러오는 코드를 모든 activity, view, fragment 에 작성해야한다. 
+
+
+Small improvement of this solution: provide not bundle but anything that might store state of your Singleton. For example, it might be SharedPreferences, Stream or maybe your own Class/Interface. Moreover, you can make those methods parameterless, so your Singleton will be implement it’s own saving mechanism. Thus, you will able to call save/restore methods from everywhere, but as I said it can turn out a huge boilerplate, if your singleton managed from many places.
+조금 개선된 버젼 : bundle 말고 다른 방법으로 state 를 저장, 예를들어 SharedPreferences, Stream 혹은 클래스나 인터페이스 등. 메서드를 파라미터없이 만들면 싱글톤이 스스로 저장하는 로직을 가진다. save/restore 를 모든 곳에서 할 있다. 하지만 역시 boilerplate 코드가 많아짐 ( get, set 용도의 메서드를 sharedpreferences 같은걸로 저장/로드 하게 만들라는 뜻인듯)
+
+Second variant. Singleton can provide its own saving mechanism and call ‘save’ methods inside setState, giving to us a possibility of “auto” saving. Also in Singleton’s initialization ‘restore’ method will be called, giving to us “auto” restoring mechanism.
+두번째 꼼수. setSate 에 저장기능 넣기. 싱글톤 초기화 'restore' 에서 자동으로 로드될것이다.
+
+Unlike previous variant, this one frees us from writing a lot of extra code. But it have shortcoming of permanent saving any setting state. For example, if you will have loop that iteratively sets new state, then every time save mechanism will be invoked. And it can be harmful for performance.
+첫번째 꼼수와는 다르게 많은 코드가 생기는것을 막아준다. 하지만 영구적으로 저장되는 단점. 예를들어 setState 가 루프안에서 돌면 성능저하가 일어난다.
+
+You can combine these two variant, giving to client opportunity to disable auto save when it will frequently sets new states and enable it later.
+클라이언트에서 자동저장 기능을 키거나 끄는 식으로 두가지 방법을 섞어 쓸 수 있다. 
+
+## What have we learned
+Above example shows that naive stateful mutable singleton can be a mess, if you not handle it properly. You need to always think, when you actually need to change it state to avoid many “entry points”. If you care about state of singleton, you need always think, where you need to save it and how.
+위의 예는 naive 한 방법으로 제대로 관리하지 않으면 싱글톤이 제대로 동작하지 않을 수 있다. 싱글톤은 항상 여기저기에서 쓸 수 있고 저장할 필요가 있다는것을 명심하라.
+
+My Singleton stores Context
+Let’s look at the code:
+아래의 코드를 보면
+
+public class ContextSingleton {
+    private static ContextSingleton instance;
+    
+    public static void init(Context context) {
+        if (instance == null) {
+            instance = new ContextSingleton(context);
+        }
+    }
+    
+    public static ContextSingleton getInstance() {
+        return instance;
+    }
+    
+    private final Context context;
+    
+    private ContextSingleton(Context context) {
+        this.context = context;
+    }
+    
+    public Context getContext() {
+        return context;
+    }
+}
+“So what’s the problem in this code?” you will say, “this singleton has immutable instance, there is no problems with state and e.t.c, what is wrong with you man?”
+
+Let’s omit problems with multithreading. We initializing our singleton in launch activity, for example through ContextSingleton.init(this), then work with our activity, then go to second activity, third, fourth and get’s OutOfMemoryException. What’s wrong?
+멀티쓰레딩 환경은 일단 생각하지말자. activity 가 실행될때 ContextSingleton.init(this) 을 통해 싱글톤을 초기화 한다. 그리고 두번째 activity 가 실행되고 세번째 activity 실행되고 네번째 . . . 그리고 메모리가 고갈된다. 
+
+
+## Problem
+In Android there are class called Context. It’s required, when you need to get access to services, resources or internal files in your application. It is used for creating views and launching another Activities. So it might seem that Context would be very helpful in your singleton object, because you can do a lot of stuff with it and thus encapsulate many things in your singleton.
+안드로이드에서는 service, 리소스 혹은 파일 등에 접근할때 사용되는 Context 라는 클래스가 있다. view 를 만들거나 다른 activity 를 실행할때도 사용되는. 그래서 Context 를 사용하는 싱글톤 객체가 매우 유용하게 보인다. 
+
+But it is an illusion. Of course there are a lot of libraries that provides singletons or single instances that keeps Context reference, but it is application context, not some ‘local’ context.
+하지만 이는 함정. 물론 많은 라이브러리에서 Context 레퍼런스하는 싱글톤을 제공하고 있다. 허나 이는 application context 이다. local context 가 아니라는 점
+
+Yes, there are Application context and, for example, Activity context. They both are instances of Context class, but first attached to application lifecycle and second to activity lifecycle. First will be destroyed, when app will be killed, second, when activity will be killed.
+Application context 와 Activity context 는 둘다 Context 클래스의 instance 이다. 하지만 Application context 는 application lifecycle 을 따르고 acitivity context 는 activity lifecycle을 따른다. Application context 는 어플리케이션이 종료될때 destroy 되고 activity context 는 activity 가 종료될때 destroy 된다.
+
+
+Now, as we remember our singleton lives all across application. So it will be destroyed when application will be destroyed. Thus when we pass, for example, activity context in singleton and then run another activity and then kill application, then everything will be all right, but if second activity will require a lot of memory, for example, then system will decide to kill first activity, but it will fail, since there are reference to it in our singleton, and we receive OutOfMemoryExeption. It is unpleasant to be honest.
+
+
+
+## Solution
+In short. Do not pass any context except app context in your singleton. Please. For more sequrity change initialization code little bit:
+간단히 말해 app context 를 제외한 context 를 싱글톤에 넣지마라 그리고 다음과 같이 초기화 코드를 변경하는 것을 추천한다.
+
+public static void init(Context context) {
+    if (instance == null) {
+        context = context.getApplicationContext();
+        instance = new ContextSingleton(context);
+    }	
+}
+
+In details. You can pass activity context if you want, but you need to be aware all the time, you need to clear reference when you stop working with your activity, replace it with another reference, when you start new activity. So it can be huge headache. I highly recommend to not pass any context in your singleton, but, if you still want to do it, please, pass only application context. And if you are 100% sure that you need to pass some ‘local’ context in your singleton (for example, you need to create an mechanism of processing bitmaps in background and displaying them in attached views), think about ‘release context reference’ mechanism. For example, you can use WeakPreference of your context objects, so system will be able to destroy them, during garbage collecting.
+좀 더 설명하자면 원한다면 이 싱글톤에 activity context 를 넘길 수 있다. 하지만 acitivity 가 종료되거나 다른 activity 로 바꾸거나 새로운 activity 를 시작하면 레퍼런스를 정리할 필요가 있다는 걸 명심하라. 골치아픈 일이기 때문에 싱글톤으로 context 를 넘기지 않는 것을 강력하게 추천한다. 하지면 굳이 context를 싱글톤으로 넘기길 원한다면 application context 를 넘겨라. 만약 local context 를 넘겨야한다는 것을 100% 확신한다면 (예를들어 백그라운드로 비트맵 연산을 해서 view 에 출력을 해야할 때) GC 가 동작할 수 있게 WeakReference 를 사용하라
+
+
+## What have we learned
+Think twice if you want to store context in your singleton. You need to be sure that using the context will be justified. And if you will use some ‘local’ context, provide mechanism for releasing its reference to allow garbage collector mark this object as unused and collect it, otherwise you might face with memory leaks in your app.
+배운것
+싱글톤에 context 를 넘길 때 두번 생각하라. 올바르게 context 를 사용하고 있는지 확신이 필요하다. local context 를 사용할 거면 객체의 사용이 끝나고 GC 가 수집할 수 있도록 release reference 하는 코드를 추가하라 아니면 메모리 누수가 생길 것이다. 
+
+## I want to use my singleton in Activity and Remote Service
+Then I have bad news for you. You can not do it. The reason is simple: your activities, fragments and other ui components are placed in application process and your Remote Service placed in remote process. And those processes are different. And there is only one way you can interact with them. It’s AIDL.
+
+Activity나 Remote Servcie 안에서 사용하고 싶을 때
+acitivity, fragment, UI component 등은 application 프로세스안에 있기 때문에 안됨, Remote Service 는 remote 프로세스 안에 있기 때문에 안됨. AIDL를 사용해야됨 (IPC 통신)
+
+If, for example, for activities and local services you can make global static state and share it between them (which is bad, but also what singleton often actually does), then for activity and remote service you can not do such thing, because each process has own class loader.
+예를들어 activity사이에서나 local service 에서는 global static state 를 만들고 공유할 수 있다. ( 나쁜예, 하지만 싱글톤에서 자주 일어나는) 그래서 activity 나 remote service 에서는 그럴 수 없다. 각각의 프로세스들이 각각의 클래스 로더를 가지고 있기 때문에
+
+Actually in our case we will have two instances of singleton. One in process of application and one in remote process.
+이 경우 두개의 싱글톤 instance 를 가진다. 하나는 application 하나는 remote process.
+
+### Solution
+If you want to use singleton that share some state through processes then, please, remove this singleton. Consider to use AIDL, broadcasts, intents. Remember, there are no singletons in multiprocessing app, only in single process. So if you have, for example, remote process and singleton in your app, make sure that this singleton be used only in one of the processes.
+프로세스간에 싱글톤을 쓰고 싶다면 제발 싱글톤 잊어버리고 AIDL, broadcast, intent 등을 사용하라. 멀티프로세싱에서 사용되는 싱글톤이란 없다. 싱글톤은 싱글프로세스에서 실행되는 것이다. 
+
+## I have immutable singleton
+immutable singleton 의 경우
+As for me Immutable Singletons (with some restrictions) are one of the options to build proper single instances in android, because you know that your instance sets up only once, during creation phase and then not changing. So it’s more easily to keep it around, even through app restarting.
+바꿀 수 없는 싱글톤(제약사항과 함께)은 안드로이드에서 싱글 인스턴스를 만들기 위한 적절한 옵션이다. 왜냐하면 instance 를 한번 생성해서 셋업하면 바뀌지 않기 때문이다. 앱을 다시 시작해도 마찬가지
+
+Although, it could be good solution of some problem, it can be a mess, if you for example create Immutable Singleton passing local context to it and not provide any mechanism to release it, as I said earlier.
+물론, 몇몇의 문제에 대해서는 좋은 해결방법이지만 immutable 싱글톤에 local context 를 넘겨준다면 망한다. 
+
+One of good usings of Immutable Singletons is to use so-called ‘extension’ of Singleton named Enumeration. Enums have some restrict, predefined number of instances, as for Singleton. But unlike Singleton there can be 2, 3, 10 instances of some class. One of good examples of enums, is to use them as typed constants. For example:
+Immutable Singletons 의 좋은 사용방법은 Enumeration 이라는 ‘extension’ 을 붙이는 것이다.  Enums 은 미리 정의된 인스턴스의 숫자, 하지만 싱글톤과는 다르게 클래스에서 2, 3, 10 개의 인스턴스가 될 수 있다. 아래의 예와 같이
+
+
+public static final String CONST_1 = “const 1”;
+public static final String CONST_2 = “const 2”;
+public static final String CONST_3 = “const 3”;
+Instead of defining string constants like that, we can define them like this:
+static final 로 상수선언하는 것 대신에 이렇게 정의할 수 있다.
+
+public enum CONSTANTS {
+    CONST_1, CONST_2, CONST_3
+}
+This approach will give you typed constants and, thus, prevent you from checking their validity in places where you will use them.
+타입정의된 상수값을 얻을 수 있고 다른 곳에서 사용할 때 유효성 검사를 생략할 수 있다.
+
+### Problem
+Actually there is no such big performance or memory problem. But there is an architectural problem. If you have in application immutable singleton then you need to think do you actually need it.
+사실 성능이슈나 메모리 이슈가 크게 문제되지는 않는다. 하지만 구조적인 문제가 있다. 만약 immutable singleton 이 있다면 반드시 필요한 것인지 다시 생각해보자.
+
+### Solution
+There are three types of immutable singletons that could came to mind right now:
+세가지 타입의 immutable singleton
+
+Singletons without state but with pack of functions. So you have singleton that have only functionality, but not state. So in code you have something like ‘Something.INSTANCE.computeSomething(SomethingOther other)’. In this case, first, you need to think about replacing singleton with ‘Utility’ class. It’s a class with private empty constructor and only static methods. So invocation will be look like ‘SomeUtil.computeSomething(SomethingOther other)’, which reduce redundant INSTANCE word. Second, if SomethingOther class is not library class, but your class, consider to move ‘computeSomething’ method to it, so invocation will be look like: ‘other.computeSomething()’.
+state 없고 함수만 있는 싱글톤. 그래서 사용할 때 ‘Something.INSTANCE.computeSomething(SomethingOther other)’ 이런 식으로 사용하게 된다. 이런 경우 싱글톤이 아닌 ‘Utility’ 클래스 같은 것으로 바꾸길 권한다. 빈생성자와 static 메서드만 있는 클래스. 그래서 ‘SomeUtil.computeSomething(SomethingOther other)’ 형식으로 사용하게 되면 'INSTANCE' 라는 단어를 줄일 수 있다. 그리고 'SomethingOther' 클래스가 라이브러리 클래스가 아니고 직접 작성한 클래스라면 'computeSomething’ 메서드를 그 클래스 안에 작성하는 것을 고려해 보는것도 좋다. 그냥 ‘other.computeSomething()’ 로 사용할 수 있게
+
+Singletons with initial state (not context) and pack of functions. As for previous point you need to provide Utility class with initial state in private constructor and static methods.
+초기 state ( context 말고) 와 함수로 이루어진 싱글톤. 마찬가지로 private 생성자에 있는 초기 state 와 static 메서드로 이루어진 ‘Utility’ 클래스로 대체될 수 있다. 
+
+Singletons with application context state and pack of functions. These singletons often appears from libraries, which are want to interact with app somehow. If you want to use something similar in your application. Consider to create not singleton, but class with constructor that has application context as parameter and invoke it in application’s onCreate callback, then store it in static field of Application class and provide static getter for accessing to it.
+Third point leads us to the next section.
+applicate context 와 함수로 이루어진 싱글톤. 앱과 상호작용하는 라이브러리에서 많이 등장한다. 앱에서 비슷한걸 사용하고 싶으면 싱글톤이 아니지만 application context 를 생성자 파라미터로 넣고 이를 Application의 onCreate 에서 호출하는 것을 고려하라. 그래서 Application 클래스의 static 필드에 저장하고 static getter 등으로 접근할 수 있게 ( 다음 문단에서 상세히 설명 예정)
+
+** state 를 변수라고 변역해도 되는지 의문
+
+## How we can create proper Singletons
+싱글톤 올바르게 쓰는법
+The answer permeates the entire article. Don’t use singletons.
+이 글의 의도는 이미 나와있다. 싱글톤 쓰지마라
+
+They provide global state, which is not OOP solution
+전역 state 사용한다. OOP에 맞지 않다.
+They can lose their state
+state를 잃어버릴 수 있다.
+They can leak your context
+context 누수가 생길 수 있다.
+They hard to test (you alway need to clear or restore init state for stateful singletons)
+test 하기 힘듬 ( init state 를 불러오거나 지우는 stateful 싱글톤이 필요)
+They are not actually singletons in multiprocessing apps
+멀티프로세싱앱에서는 싱글톤이 싱글톤이 아님
+They can be executed everywhere and it can lead to reducing maintainability
+어디서나 실행가능해서 유지보수하기 힘들다.
+In multithreading apps they can change state from any thread and this can lead to unexpected results
+멀티쓰레드 환경에서 예상못한 동작
+They can not be extended
+확장성 부족
+
+For now I don’t use singletons. If I need to provide a global state I create a single instance of some class, and single instance concept differs from singleton. Single instance is created to provide some global state (which is bad in OOP generally, but is normal in android), but you can still create multiple instances of your class. This gives us possibility to properly test our class, or create local instances for doing some small specific work, or to extend them with new logic.
+지금부터 싱글톤 쓰지 않겠다. 전역 state 가 필요하면 single instance 를 쓸 것이다. single instance 개념은 싱글톤이랑 다르다. single instance 는 전역 state 를 제공하기 위해 만들어진다.( OOP 에서 일반적이지 않지만 Android 에서는 일반적이다) 하지만 여전히 클래스에서는 여러개의 instance 를 만들 수 있다. 그래서 클래스를 테스트하거나 자잘한 작업들을 처리하기 위한 local instance를 만들기 좋다. 또한 로직을 확장하는 것도
+
+So to create global instance of our class we need to extend application class and add initialisation of our class in onCreate method. Then we need to provide static getter for our global instance.
+클래스의 전역 instance 를 만들기 위해 application class 를 상속받고 onCreate 메서드에서 초기화 시켜준다. 이제 global instance 의 static getter 를 사용할 수 있다.
+
+
+public class MyApplication extends Application {
+    private static Something something;
+
+    public void onCreate() {
+        super.onCreate();
+        something = new Something();/new Something(getApplicationContext())/new Something(InitState state);
+    }
+
+    public static Something getSomething() {
+        return something.
+    }
+
+}
+
+Then we can invoke anywhere in code ‘getSomething()’ and work with our global instance.
+‘getSomething()’ 을 호출해서 global instance 에 접근할 수 있다. 
+
+## Afterwords
+Singletons are bad and you should avoid them. Especially in Android. But if you really need global state, write your class properly and create global instances through application creation phase.
+싱
+P.S.: Links
+If you liked article there are other by me about improve working with permissions, saving states and refactoring base fragment.
