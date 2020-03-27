@@ -74,23 +74,11 @@ module.exports = {
         trackingId: config.googleAnalyticsTrackingId,
       },
     },
-    // {
-    //   resolve: "gatsby-plugin-firebase",
-    //   options: {
-    //     features: {
-    //       auth: false,
-    //       database: false,
-    //       firestore: false,
-    //       storage: false,
-    //       messaging: false,
-    //       functions: true,
-    //     },
-    //   },
-    // },
     {
       resolve: "gatsby-plugin-firebase",
       options: {
         credentials: {
+          apiKey: "AIzaSyCMxSqyXJ9UA2pi1lLmYv9r2EXIqnDEgmw",
           authDomain: "kklyoon-github-io.firebaseapp.com",
           databaseURL: "https://kklyoon-github-io.firebaseio.com",
           projectId: "kklyoon-github-io",
