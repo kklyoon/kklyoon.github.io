@@ -2,7 +2,6 @@ require('dotenv').config();
 const config = require('./config');
 
 module.exports = {
-  pathPrefix: "/kklyoon.github.io",
   siteMetadata: {
     title: config.title,
     author: config.author,

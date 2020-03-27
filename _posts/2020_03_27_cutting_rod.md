@@ -1,6 +1,6 @@
 ---
 title: "[Algorithm] 막대 자르기"
-date: 2019-11-02
+date: 2020-03-27
 tags:
   - programming
   - algorithm
