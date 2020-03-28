@@ -38,7 +38,7 @@ __2) 중복문제__</br>
 
 다음과 같이 간단한 재귀함수를 구현할 수 있다.
 
-```c++
+```C++
 int cutRod(int price[], int n) 
 { 
    if (n <= 0) 
@@ -76,7 +76,7 @@ CR(0)
 
 위의 트리를 참고하면 cR(2) 같은 경우 두번 계산되게 된다. 트리의 depth 가 깊으면 깊을수록 이런 중복된 계산이 많아질 것이다. 따라서 이렇게 계산된 값들은 미리 저장해두는 것이 좋다. 
 
-```c++
+```C++
 int cutRod(int price[], int n) 
 { 
    int val[n+1]; 
@@ -101,7 +101,7 @@ val[i] 는 i 길이 일때 최대값, 길이는 1부터 시작 <br>
 Time Complexity 는 O(n<sup>2</sup>)로 첫번째 방법의 worst case 보다 낫다. 
 
 재귀함수 구현은 다음과 같음
-```c++
+```C++
 int cutting_rod_recurv(int price[], int n, int cut)
 {
     if( cut == n-1 )
