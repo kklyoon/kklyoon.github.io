@@ -1,6 +1,6 @@
 ---
 title: "[Algorithm][프로그래머스] 디스크 컨트롤러"
-date: 2020-04-06
+date: 2020-04-08
 tags:
   - 알고리즘
   - algorithm
