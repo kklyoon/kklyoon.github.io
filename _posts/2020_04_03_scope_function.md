@@ -6,6 +6,11 @@ tags:
   - 코틀린
   - ScopeFunction
   - 번역
+  - run
+  - with
+  - let
+  - apply
+  - also
 ---
 
 # Scope Functions
@@ -95,10 +100,11 @@ fun main() {
 ```
 
 </div>
+<br>
 
-#### this
+### __this__
 
-`run`, `with`, `apply` 에서는 `this`로 객체에 접근한다. `this`를 생략하고 사용할 수 있지만 생략할 경우 리시버의 멤버인지 외부 객체/함수 인지 구분하기 어렵다. 그래서 `this`를 사용하는걸 추천
+`run`, `with`, `apply` 에서는 람다 리시버인 `this`로 객체에 접근한다. 그리고 람다 안에서는 일반적인 클래스 함수에 있는 객체처럼 사용할 수 있다. `this`를 생략하고 사용할 수 있지만 생략할 경우 리시버의 멤버인지 외부 객체/함수 인지 구분하기 어렵다. 그래서 `this`를 사용하는걸 추천
 
 
 <div class="sample" markdown="1" theme="idea">
@@ -118,10 +124,11 @@ fun main() {
 ```
 
 </div>
+<br>
 
-#### it
+### __it__
 
-`let` 과 `also` 에서는 `it`으로 객체 참조. 
+`let` 과 `also` 에서는 람다 매개변수인 `it`으로 객체 참조. 
 
 <div class="sample" markdown="1" theme="idea">
 
@@ -183,9 +190,9 @@ fun main() {
 
 결과 값을 가지고 다음코드에서 무엇을 할지에 따라 선택해서 사용하면 됨
 
-#### Context object 
+#### __Context object__
 
-`apply`, `also` 는 리시버 객체를 리턴하기 때문에 다음과 같이 chain 형태로 사용할 수 있다.
+`apply`, `also` 는 객체 자신을 리턴하기 때문에 다음과 같이 chain 형태로 사용할 수 있다.
 
 <div class="sample" markdown="1" theme="idea">
 
@@ -236,7 +243,6 @@ fun main() {
 
 #### 람다 결과
 
-`let`, `run`, and `with` return the lambda result. So, you can use them when assigning the result to a variable, chaining operations on the result, and so on.
 
 `let`, `run`, `with` 은 람다 결과 값을 리턴한다. 그래서 결과값을 변수에 넣거나 결과에 체이닝 연산을 걸 수 있다.
 
@@ -283,10 +289,10 @@ fun main() {
 
 ### `let`
 
-**객채**는 `it` 매개변수으로 참조. 
-**The return value** 람다 결과.
+**객채**는 매개변수으로 사용(`it`). 
+**리턴값**은 람다 결과.
 
-다음과 같은 코드를
+`let`은 콜체인의 결과에서 하나 이상의 함수 호출하는데 사용할 수 있다.
 
 <div class="sample" markdown="1" theme="idea">
 
@@ -379,7 +385,7 @@ fun main() {
 ### `with`
 
 
-확장함수가 아닌 일반함수, 객체는 람다 안에서 `this`를 리시버로 받는다. **리턴값**은 람다결과
+확장함수가 아닌 일반함수: 객체는 매개변수로 전달, 객체를 람다 안에서 리시버로 받는다(`this`). **리턴값**은 람다결과
 
 
 `with`은 람다 결과없는 객체를 위해 사용하는 것을 추천 `with`는 "이 객체로 다음과 같이 실행" 으로 읽혀질 수 있다.
@@ -400,7 +406,7 @@ fun main() {
 
 </div>
 
-`with`의 다른 사용법은 다른 객체의 멤버나 함수를 사용해서 값을 계산할 때 
+`with`의 다른 사용법은 객체의 멤버나 함수를 사용해서 값을 계산할 때 
 
 <div class="sample" markdown="1" theme="idea">
 
@@ -422,7 +428,7 @@ fun main() {
 ### `run`
 
 
-**객체** 는 `this`를 리시버로 받는다. **리턴값** 람다 결과 값
+**객체**는 리시버로 사용된다 (`this`). **리턴값**은 람다 결과 값
 
 
 `run`은 `with`와 비슷하지만 `let`처럼 객체의 확장함수로 동작한다.
@@ -433,6 +439,7 @@ fun main() {
 <div class="sample" markdown="1" theme="idea">
 
 ```kotlin
+
 class MultiportService(var url: String, var port: Int) {
     fun prepareRequest(): String = "Default request"
     fun query(request: String): String = "Result for query '$request'"
@@ -486,7 +493,7 @@ fun main() {
 
 ### `apply`
 
-**객체** 는 `this`를 리시버로 받는다. **리턴값** 은 객체 자기자신이다.
+**객체**는 리시버로 사용된다 (`this`). **리턴값** 은 객체 자기자신이다.
 
 코드 블록에서 `apply`는 리턴값을 가지지 않고 리시버 객체의 멤버 연산에 사용된다. 객체구성이 일반적인 경우이다. 이런한 호출은 "_이러한 할당을 오브젝트에 적용한다_"라는 식으로 읽을 수 있다.
 
@@ -513,12 +520,12 @@ fun main() {
 
 ### `also`
 
-**객체**는 `it` 매개변수로 전달된다. **리턴값**은 객체 자신
+**객체**는 매개변수(`it`)로 전달된다. **리턴값**은 객체 자신
 
 
-`also`는 객체를 매개변수를 처리하는데 유용하다. 로깅같은 디버깅 정보를 출력하는 처리 등 객체를 대체하지 않는 동작에 사용된다. 보통은 콜체인에서 `also`를 삭제해도 로직에는 영향을 주지 않는다.
+`also`는 객체를 매개변수로 처리하는데 유용하다. 로깅같이 디버깅 정보를 출력하는 처리 등 객체의 멤버보단 객체 참조가 필요한 동작에 사용된다. 
 
-`also`를 코드에서 사용할 때 "_그리고 이 동작도 수행하라_"라는 뜻으로 해석할 수 있다.
+`also`를 코드에서 읽을 때 "_그리고 객체로 이 동작도 수행하라_"라는 뜻으로 해석할 수 있다.
 
 <div class="sample" markdown="1" theme="idea">
 
