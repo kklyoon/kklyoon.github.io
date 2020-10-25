@@ -68,7 +68,7 @@ __Context__
 
 lifecycle과 마찬가지로 Context는 수 많은 역할을 하기 때문에 무엇인지 설명하기는 어렵다. 따라서 이를 한두 문장으로 설명하기엔 불가능하다. 그렇지만, Context의 역할과 서로다른 Context들의 차이점을 이해하는 것은 중요하다.
 
-context는 맥락이다. 이 [StackOverflow 쓰레드](https://stackoverflow.com/questions/3572463/what-is-context-on-android)과 [이 글](https://stackoverflow.com/questions/10641144/difference-between-getcontext-getapplicationcontext-getbasecontext-and/42700601#42700601)을 읽어보길 권한다.(채택답변은 스킵하고)
+context는 말그대로 맥락이다. 이 [StackOverflow 쓰레드](https://stackoverflow.com/questions/3572463/what-is-context-on-android)과 [이 글](https://stackoverflow.com/questions/10641144/difference-between-getcontext-getapplicationcontext-getbasecontext-and/42700601#42700601)을 읽어보길 권한다.(채택답변은 스킵하고)
 
 
 __User Interface (UI) Thread Responsiveness__

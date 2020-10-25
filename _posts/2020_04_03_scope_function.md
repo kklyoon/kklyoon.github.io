@@ -569,6 +569,10 @@ fun main() {
 
 scope function 은 코드를 줄이는 방법 중에 하나이긴 하지만 남용은 피하자 ( 코드 가독성을 떨어뜨리거나 에러가 나는 경우도...). scope function 을 chaining 해서 쓰게 되면 `this` 나 `it`의 값이 헷갈리거나 현재 객체를 혼동할 수 있다.
 
+### Scope Function 선택하는법
+![decide_scope](./scope_decision.png)
+
+
 ## `takeIf` and `takeUnless`
 
 standard library 에는 `takeIf` 와 `takeUnless` 함수가 포합되어 있다. 이 함수들로 콜 체인에서 객체상태를 체크할 수 있다.
@@ -658,7 +662,6 @@ fun main() {
 ```
 
 </div>
-
 
 ## Reference
 
