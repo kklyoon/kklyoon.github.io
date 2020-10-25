@@ -73,21 +73,6 @@ module.exports = {
       options: {
         trackingId: config.googleAnalyticsTrackingId,
       },
-    },
-    {
-      resolve: "gatsby-plugin-firebase",
-      options: {
-        credentials: {
-          apiKey: "AIzaSyCMxSqyXJ9UA2pi1lLmYv9r2EXIqnDEgmw",
-          authDomain: "kklyoon-github-io.firebaseapp.com",
-          databaseURL: "https://kklyoon-github-io.firebaseio.com",
-          projectId: "kklyoon-github-io",
-          storageBucket: "kklyoon-github-io.appspot.com",
-          messagingSenderId: "931868777399",
-          appId: "1:931868777399:web:3fc9f49e9509942c15a632",
-          measurementId: "G-S25Y2JCZ8H"
-        }
-      }
     }
   ],
 };
