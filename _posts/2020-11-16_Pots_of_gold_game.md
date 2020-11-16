@@ -22,10 +22,10 @@ At the end I was asked to code this strategy!
 
 A와 B 모두 자신에게 가장 유리한 값을 고른다는 조건이 관건이다.
 
-- A가 왼쪽을 고른것 + min(B가 다음 왼쪽을 고른것, B가 오른쪽을 고른것)
-- A가 오른쪽을 고른것 + min(B가 왼쪽을 고른것, B가 다음 오른쪽을 고른것)
+- A가 왼쪽을 고른경우 + min(B가 다음 왼쪽을 고른경우, B가 오른쪽을 고른경우)
+- A가 오른쪽을 고른것 + min(B가 왼쪽을 고른경우, B가 다음 오른쪽을 고른경우)
 
-을 각각 구한뒤에 큰값을 고르면 된다.
+을 각각 구한 뒤 큰값을 고르면 된다.
 
 ```kotlin
 import kotlin.math.*
@@ -40,3 +40,5 @@ fun sol(arr: IntArray, start: Int, end: Int): Int{
 }
 
 ```
+
+DP문제는 점화식을 어떻게 구하는가가 관건인듯하다.
