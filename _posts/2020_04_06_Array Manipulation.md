@@ -37,7 +37,7 @@ index->	 1 2 3  4  5 6 7 8 9 10
 
 구간별 값을 시작지점에 더하고 끝지점+1 에 구간별 값을 빼준다.
 
-반복문이 끝나고 배열의 값을 n 까지 모두 더하면 가장 큰 구간의 값을 찾을수 있다. 
+반복문이 끝나고 배열의 값을 n 까지 모두 더하다 보면 가장 큰 구간의 값을 찾을수 있다. 
 
 ```c++
 long arrayManipulation(int n, vector<vector<int>> queries) {
@@ -58,5 +58,26 @@ long arrayManipulation(int n, vector<vector<int>> queries) {
     return max;
 }
 ```
+코틀린 코드
+
+```kotlin
+fun arrayManipulation(n: Int, queries: Array<Array<Int>>): Long {
+    var arr = LongArray(n+1, {0})
+    var result: Long = 0
+    var temp: Long = 0
+    queries.forEach{v ->
+        arr[v[0]-1] += v[2].toLong()
+        arr[v[1]] -= v[2].toLong()
+    }
+    arr.forEach{ 
+        temp += it
+        if(result < temp) result = temp
+        }
+    
+    return result
+
+}
+```
 
 구간별 값은 구간에만 해당되고 구간이 끝나면 다시 빼는 생각을 해야 나올 수 있는 발상
+
