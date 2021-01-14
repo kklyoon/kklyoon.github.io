@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://kklyoon.github.io/sitemap.xml
+Host: https://kklyoon.github.io
