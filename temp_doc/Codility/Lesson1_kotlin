@@ -1,0 +1,25 @@
+
+// https://app.codility.com/programmers/lessons/1-iterations/
+
+import java.util.*
+
+fun solution(N: Int): Int {
+    val str = N.toString(2)
+    var ans = 0
+    var pV = 0
+    var rx = Regex("1")
+    val matches = rx.findAll(str)
+    
+    for(match in matches){
+        val sV = match.range.start
+        if(sV - pV > 1 && sV - pV > ans){
+            ans = sV - pV - 1
+        }
+        pV = sV
+    }
+    
+    return ans 
+}
+
+// 좀더 깔끔하게 처리할 수도 있겠다 싶다.
+

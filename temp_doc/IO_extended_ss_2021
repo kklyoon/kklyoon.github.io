@@ -1,0 +1,47 @@
+Jetpack
+
+Opt in 어노테이션 추가
+
+Motion Layout -> stable 버전
+
+CameraX -> lolipop 이상
+
+Hilt -> Stable 
+
+
+WorkManager 2.5+ 부터 멀티프로세스 앱 지원
+
+2.7 부터 android S 포그라운드 제한 지원
+WorkManager Inspector -> Android arctic fox 부터 사용가능
+
+Room : KSP 지원, enums 기본 지원, RxJava3 지원, QueryCallback 도입
+
+Paging3 : stable 버전, Kotlin coroutines, flow 지원, RxJava, Guava 사용 가능, Header, Footer, Seperator 및 로딩 상태 지원
+        -> 마이그레이션 지원 
+
+Security Crypto : SharePreference 암호화, Mashimallow 부터 지원 -> 나중에 DataStore 와 통합
+
+==== beta 
+DataStore : beta 버전 SharedPreference 대체제, RxJava2,3 지원, 여러구현체 지원, 직접 구현도 가능 -> SharedPreference 마이그레이션 지원
+
+Navigation : 싱글 액티비티 -> 다중 백 스택기능 포함, 직접 API 호출하는 방법도 있음
+
+AppSearch: 고성능 전체 텍스트 검색,  Icing search 사용해서 고성능
+
+Macrobenchmark : 로컬 또는 CI 에서 성능 측정 가능, 테스트룰 생성 후 측정 -> 샘플을 돌려보셈
+
+Google Shortcuts : 구글 제품에 바로가기 제공
+
+EmojiCompat : AppCompat 사용하면 쓸 수 있음, 아니면 EmojitoView 를 사용가능
+
+Startup : 앱 시작시 구성 요소를 초기화하는 라이브러리 
+
+LiveData 는 안버림 -> Flow 와 비교하고 전환하는게 바람직 (Kotlin 사용자라면)
+
+
+Session2
+
+
+
+
+

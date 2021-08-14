@@ -1,0 +1,423 @@
+// you can also use imports, for example:
+// import kotlin.math.*
+
+// you can write to stdout for debugging purposes, e.g.
+// println("this is a debug message")
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    // write your code in Kotlin
+    //var ans = 0
+    var sum = 0
+    for(i in 1 until A.size+2){
+        sum += i
+    }
+    A.forEach{
+        sum -= it
+    }
+    return sum
+}
+
+import java.util.*
+import kotlin.math.*
+
+fun solution(A: IntArray): Int {
+    var ans = Int.MAX_VALUE
+    var sumFirst = 0
+    var sumLast = A.sum()
+    for(i in 1 until A.size){
+        sumFirst += A[i-1]
+        sumLast -= A[i-1]
+        val diff = (sumFirst - sumLast).absoluteValue
+        if(diff < ans) 
+            ans = diff
+    }
+    return ans
+}
+
+
+import java.util.*
+
+fun solution(X: Int, A: IntArray): Int {
+    var cur = 0
+    val ba = BooleanArray(A.size+1){false}
+    if(A.size < X) return -1
+    for(i in 0 until A.size){
+        if(A[i] <= X) {
+            if(!ba[A[i]-1]) cur++
+            ba[A[i]-1] = true
+        }
+        if(cur == X) return i
+        
+    }
+    return -1
+}
+
+
+import java.util.*
+
+fun solution(N: Int, A: IntArray): IntArray {
+    var ans = IntArray(N){0}
+    A.forEachIndexed{ _, v ->
+        var t = v - 1
+        if(t == N){
+            var maxV = ans.max()
+            maxV?.let{
+                ans = IntArray(N, {_->it})
+            }
+        }
+        else {
+            ans[t] = ans[t]+1
+        }
+    }
+    return ans
+}
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    // write your code in Kotlin
+    var ans = 1
+    A.sort()
+    
+    A.forEach{ value ->
+        if(value > 0 && ans == value){
+            ans = value+1
+        }
+    }
+    
+    return ans
+}
+
+
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    //var ans = 0
+    var sum = 0
+    val hs = HashSet<Int>()
+    for(i in 1 until A.size+1){
+        sum +=i
+        hs.add(A[i-1])
+    }
+    if(sum == A.sum() && hs.size == A.size) return 1
+    return 0
+}
+
+import java.util.*
+
+fun solution(A: Int, B: Int, K: Int): Int {
+    
+    var ans = 0
+    var cnt = 0
+    if(A==B){
+        if(A % K == 0) return 1
+        else return 0
+    }
+    for(i in A until B+1) {
+        if(i % K == 0){
+            ans = i
+            cnt++
+            break
+        }
+    }
+    cnt += (B-ans)/K
+    
+    return cnt
+}
+
+// 더 간단하게
+fun solution(A: Int, B: Int, K: Int): Int {
+    // write your code in Kotlin
+    val min_value = ((A + K - 1) / K ) * K
+    if(min_value > B)
+        return 0
+    return ((B - min_value)/K)+1
+}
+
+import java.util.*
+
+fun solution(S: String, P: IntArray, Q: IntArray): IntArray {
+    var ans = IntArray(P.size)
+    val iArr = ArrayList<Int>()
+    S.forEachIndexed{ i, v ->
+        iArr.add(getIF(v))
+    }
+    P.forEachIndexed{i, v ->
+        ans[i] = iArr.slice(v..Q[i]).min()?:0
+    }
+    return ans
+}
+
+fun getIF(C: Char): Int{
+    when(C){
+        'A' -> return 1
+        'C' -> return 2
+        'G' -> return 3
+        'T' -> return 4
+    }
+    return 0
+}
+
+// 성능개선
+import java.util.*
+
+fun solution(S: String, P: IntArray, Q: IntArray): IntArray {
+    var ans = IntArray(P.size)
+    val arA = IntArray(S.length){-1}
+    val arC = IntArray(S.length){-1}
+    val arG = IntArray(S.length){-1}
+    val arT = IntArray(S.length){-1}
+    
+    for(i in 0 until S.length){
+        wcToList(S, arA, 'A', i)
+        wcToList(S, arC, 'C', i)
+        wcToList(S, arG, 'G', i)
+        wcToList(S, arT, 'T', i)
+    }
+    for(i in 0 until Q.size){
+        if(arA[Q[i]] >= P[i])   ans[i] = 1
+        else if (arC[Q[i]] >= P[i]) ans[i] = 2
+        else if (arG[Q[i]] >= P[i]) ans[i] = 3
+        else ans[i] = 4
+ 
+    }
+    return ans
+}
+
+fun wcToList(S:String, arr: IntArray, C: Char, i: Int){
+    if(S[i] == C)
+        arr[i] = i
+    else if (i >0 )
+        arr[i] = arr[i-1]
+}
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    var ans = 0
+    var min:Double = 10001.0
+    for(i in 0 until A.size-1){
+        if((A[i] + A[i+1])/2.0 < min){
+            ans = i
+            min = (A[i] + A[i+1])/2.0
+        }
+        if(i < A.size-2 && (A[i]+A[i+1]+A[i+2])/3.0 < min)
+        {
+            ans = i
+            min = (A[i] + A[i+1] + A[i+2])/3.0
+        }
+            
+    }
+    return ans
+}
+
+
+// 문제 이해 못함
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    var sum = 0
+    var cnt = 0
+    A.forEach{ cnt+=it}
+    
+    for(i in 0 until A.size){
+        if(A[i] == 0){
+            sum += cnt
+            if(1000_000_000 < sum) return -1
+        
+        } else {
+            cnt--
+        }
+    }
+    
+    return sum
+}
+
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    val hs = HashSet<Int>()
+    A.forEach{
+        hs.add(it)
+    }
+    return hs.size
+}
+
+import java.util.*
+import kotlin.math.*
+
+fun solution(A: IntArray): Int {
+    var ans = 0
+    A.sort()
+    
+    ans = max(A[0]*A[1]*A[A.size-1], A[A.size-1]*A[A.size-2]*A[A.size-3])
+
+    return ans
+}
+
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    if(A.size < 3) return 0
+    A.sort()
+    for(i in 0 until A.size-2){
+        if(A[i] + A[i+1] > A[i+2]) return 1
+    
+    }
+    return 0
+}
+
+import java.util.*
+
+fun solution(S: String): Int {
+
+    val st = Stack<Char>()
+    S.forEach{ s ->
+        if(s == '(' || s== '[' || s== '{') st.push(s)
+        else if (st.empty())  return 0
+        
+        else {
+            when(st.pop()){
+                '(' -> if(s!=')') return 0
+                '[' -> if(s!=']') return 0
+                '{' -> if(s!='}') return 0
+                else -> return 0
+            }
+        }
+    }
+    if(st.size != 0) return 0
+    return 1
+}
+import java.util.*
+
+fun solution(A: IntArray, B: IntArray): Int {
+    val st = Stack<Int>()
+    var count = 0
+    
+    for(i in 0 until B.size){
+        if(B[i] == 0){
+            while(st.size !=0){
+                if(st.peek() > A[i]) break
+                else st.pop()
+            }
+            if(st.empty()) {
+                count++
+            }
+        }
+        else st.push(A[i])
+    }
+    count += st.size
+    return count
+}
+
+// you can also use imports, for example:
+// import kotlin.math.*
+
+// you can write to stdout for debugging purposes, e.g.
+// println("this is a debug message")
+
+import java.util.*
+
+fun solution(S: String): Int {
+    val st = Stack<Char>()
+    S.forEach{ v ->
+        when(v){
+            '(' -> st.push(v)
+            ')' -> if(st.empty()) return 0 else st.pop()
+            else -> return 0
+        }
+    }
+    if(st.size != 0) return 0
+    return 1
+}
+
+
+// 문제 이해 못함
+import java.util.*
+
+fun solution(H: IntArray): Int {
+    // write your code in Kotlin
+    var count = 0
+    val st = Stack<Int>()
+    H.forEach{ v->
+        while(st.size != 0 && st.peek() > v){
+            st.pop()
+        }
+        if (st.size == 0 || st.peek() != v){
+            count++
+            st.push(v)
+        }
+    }
+    return count
+}
+
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    var can = 0
+    var cnt = 0
+    
+    A.forEach{value ->
+        if(can == 0){
+            can = value
+            cnt = 1
+        } else {
+            if(value != can){
+                cnt--
+                if(cnt == 0) can=0
+            }
+            else cnt++
+        }
+    }
+    var c = 0
+    var last = 0
+    if(cnt == 0) return -1
+    A.forEachIndexed{i,v ->
+        if(v == can){
+            last = i
+            c++
+        }
+    }
+    if(c > A.size/2) return last
+    
+    return -1
+}
+
+
+// 77%
+import java.util.*
+
+fun solution(A: IntArray): Int {
+    var can = 0
+    var can_cnt = 0
+    A.forEach{value ->
+        if(can == 0){
+            can = value
+            can_cnt = 1
+        } else {
+            if(can != value){
+                can_cnt--
+                if(can_cnt==0) can=0
+            } else{
+                can_cnt++
+            }
+        }
+    }
+    var cnt = 0
+    A.forEach{ value ->
+        if(value==can) cnt++
+    }
+    if(cnt < A.size/2) return 0
+    var e_cnt = 0
+    var l_cnt = 0
+    A.forEachIndexed{i, v ->
+        if(v == can) l_cnt++
+        if(l_cnt > (i+1)/2 && cnt - l_cnt > (A.size - i - 1)/2) e_cnt++
+    }
+    return e_cnt
+}
